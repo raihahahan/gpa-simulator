@@ -7,6 +7,7 @@ export const data = {
   ],
   title: "NUS GPA Calculator",
   description: "Calculate and simulate your NUS GPA",
+  githubLink: "https://github.com/raihahahan/gpa-simulator",
 };
 
 export const GRADES: Grade[] = [

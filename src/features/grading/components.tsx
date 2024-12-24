@@ -23,6 +23,7 @@ import {
 } from "@tabler/icons-react";
 import { useGlobalMediaQuery } from "@/common/hooks";
 import { useGrading } from "./hooks";
+import { useRouter } from "next/navigation";
 
 export default function GradingComponent() {
   const { xs, sm } = useGlobalMediaQuery();
@@ -42,6 +43,8 @@ export default function GradingComponent() {
   } = useGrading();
 
   const gpa = calculateGPA(modules);
+  const router = useRouter();
+  const goToGitHub = () => router.push(data.githubLink);
 
   return (
     <ComponentWrapper>
@@ -233,15 +236,23 @@ export default function GradingComponent() {
           Clear
         </Button>
         {xs ? (
-          <Button color="dark" leftSection={<IconBrandGithub />}>
+          <Button
+            color="dark"
+            leftSection={<IconBrandGithub />}
+            onClick={goToGitHub}
+          >
             GitHub
           </Button>
         ) : sm ? (
-          <ActionIcon color="dark" size="lg">
+          <ActionIcon onClick={goToGitHub} color="dark" size="lg">
             <IconBrandGithub />
           </ActionIcon>
         ) : (
-          <Button color="dark" leftSection={<IconBrandGithub />}>
+          <Button
+            color="dark"
+            leftSection={<IconBrandGithub />}
+            onClick={goToGitHub}
+          >
             Source Code
           </Button>
         )}
