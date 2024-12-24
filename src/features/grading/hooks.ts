@@ -21,7 +21,7 @@ export function useGrading() {
         const updatedModules = [...modules];
         updatedModules[editingIndex] = {
           ...newModule,
-          name: newModule.name.toUpperCase(),
+          name: newModule.name.toUpperCase().trim(),
           points: gradeData ? gradeData.points : 0,
         };
         setModules(updatedModules);
@@ -32,7 +32,9 @@ export function useGrading() {
             (m) => m.name.toUpperCase() == newModule.name.toUpperCase()
           )
         ) {
-          setError(`Module ${newModule.name.toUpperCase()} is already added.`);
+          setError(
+            `Module ${newModule.name.toUpperCase().trim()} is already added.`
+          );
           return;
         }
         setModules([
@@ -109,7 +111,12 @@ export function useGrading() {
     }
   };
 
-  const handleClear = () => setModules([]);
+  const handleClear = () => {
+    const p = confirm("Are you sure?");
+    if (p) {
+      setModules([]);
+    }
+  };
 
   return {
     handleEdit,
