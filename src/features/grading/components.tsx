@@ -10,7 +10,7 @@ import {
   Group,
   ActionIcon,
 } from "@mantine/core";
-import { calculateGPA, calculateSuCount } from "./utils";
+import { calculateGPA, calculateGradedUnits, calculateSuCount } from "./utils";
 import Image from "next/image";
 import ComponentWrapper from "@/common/wrapper";
 import { data, GRADES } from "../../common/data";
@@ -45,6 +45,7 @@ export default function GradingComponent() {
 
   const gpa = calculateGPA(modules);
   const SUs = calculateSuCount(modules);
+  const gradedUnits = calculateGradedUnits(modules);
   const router = useRouter();
   const goToGitHub = () => router.push(data.githubLink);
 
@@ -222,6 +223,14 @@ export default function GradingComponent() {
           mt="lg"
         >
           S/Us used: {SUs}
+        </Text>
+        <div style={{ margin: xs ? 0 : 10 }}></div>
+        <Text
+          style={{ textAlign: "center", fontWeight: "bold" }}
+          size="lg"
+          mt="lg"
+        >
+          Graded Units: {gradedUnits}
         </Text>
       </div>
 

@@ -13,3 +13,11 @@ export const calculateGPA = (modules: Module[]): string => {
 export const calculateSuCount = (modules: Module[]): number => {
   return modules.filter((m) => m.su).length;
 };
+
+export const calculateGradedUnits = (modules: Module[]): number => {
+  return modules.reduce(
+    (acc, module) =>
+      !module.su && module.grade != "CS/CU" ? acc + module.credits : acc,
+    0
+  );
+};

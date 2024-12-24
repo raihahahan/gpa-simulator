@@ -11,6 +11,8 @@ export const data = {
   githubLink: "https://github.com/raihahahan/gpa-simulator",
 };
 
+export const TOTAL_MC = 160;
+
 export const GRADES: Grade[] = [
   { grade: "A+", points: 5.0 },
   { grade: "A", points: 5.0 },
