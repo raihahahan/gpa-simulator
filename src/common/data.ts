@@ -4,6 +4,7 @@ export const data = {
   instructions: [
     "Add the courses you have completed or wish to simulate.",
     "Once done, you may export a json data of this and import it back in the future.`",
+    "You may also choose to ignore CS/CU mods or mods that you have S/U'ed.",
   ],
   title: "NUS GPA Calculator",
   description: "Calculate and simulate your NUS GPA",
@@ -22,6 +23,7 @@ export const GRADES: Grade[] = [
   { grade: "D+", points: 1.5 },
   { grade: "D", points: 1.0 },
   { grade: "F", points: 0.0 },
+  { grade: "CS/CU", points: 0.0 },
 ];
 
 export const gradePoints = {

@@ -10,7 +10,7 @@ import {
   Group,
   ActionIcon,
 } from "@mantine/core";
-import { calculateGPA } from "./utils";
+import { calculateGPA, calculateSuCount } from "./utils";
 import Image from "next/image";
 import ComponentWrapper from "@/common/wrapper";
 import { data, GRADES } from "../../common/data";
@@ -21,7 +21,7 @@ import {
   IconPlus,
   IconTrash,
 } from "@tabler/icons-react";
-import { useGlobalMediaQuery } from "@/common/hooks";
+import { useGlobalMediaQuery, usePreventPageRefresh } from "@/common/hooks";
 import { useGrading } from "./hooks";
 import { useRouter } from "next/navigation";
 
@@ -41,8 +41,10 @@ export default function GradingComponent() {
     editingIndex,
     error,
   } = useGrading();
+  usePreventPageRefresh(modules);
 
   const gpa = calculateGPA(modules);
+  const SUs = calculateSuCount(modules);
   const router = useRouter();
   const goToGitHub = () => router.push(data.githubLink);
 
@@ -82,7 +84,7 @@ export default function GradingComponent() {
           </Text>
         );
       })}
-
+      <div style={{ marginTop: 10 }}></div>
       {/* Input Form */}
       <Group
         mb="lg"
@@ -198,13 +200,30 @@ export default function GradingComponent() {
       {error && (
         <Text style={{ color: "red", textAlign: "center" }}>{error}</Text>
       )}
-      <Text
-        style={{ textAlign: "center", fontWeight: "bold" }}
-        size="lg"
-        mt="lg"
+      <div
+        style={{
+          alignSelf: "center",
+          justifySelf: "center",
+          display: "flex",
+          flexDirection: xs ? "column" : "row",
+        }}
       >
-        GPA: {gpa}
-      </Text>
+        <Text
+          style={{ textAlign: "center", fontWeight: "bold" }}
+          size="lg"
+          mt="lg"
+        >
+          GPA: {gpa}
+        </Text>
+        <div style={{ margin: xs ? 0 : 10 }}></div>
+        <Text
+          style={{ textAlign: "center", fontWeight: "bold" }}
+          size="lg"
+          mt="lg"
+        >
+          S/Us used: {SUs}
+        </Text>
+      </div>
 
       {/* Import/Export Buttons */}
       <Group

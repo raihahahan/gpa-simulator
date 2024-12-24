@@ -12,3 +12,23 @@ export function useGlobalMediaQuery(): globalMediaQueriesType {
 
   return { xs, sm, md, lg, xl, larger_than_xl };
 }
+
+import { useEffect } from "react";
+import { Module } from "@/features/grading/types";
+
+export const usePreventPageRefresh = (modules: Module[]) => {
+  useEffect(() => {
+    const handleBeforeUnload = (event: BeforeUnloadEvent) => {
+      if (modules.length > 0) {
+        event.preventDefault();
+        event.returnValue = ""; // Standard for modern browsers
+      }
+    };
+
+    window.addEventListener("beforeunload", handleBeforeUnload);
+
+    return () => {
+      window.removeEventListener("beforeunload", handleBeforeUnload);
+    };
+  }, [modules.length]);
+};
