@@ -11,7 +11,6 @@ A fast and efficient GPA simulator for NUS students. This tool allows you to sim
 - Built with React Next.js and Mantine UI
 - Option to easily S/U the mod
 
-## Screenshots
 
 ## Quick Setup
 
