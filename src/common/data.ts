@@ -5,6 +5,7 @@ export const data = {
     "Add the courses you have completed or wish to simulate.",
     "Once done, you may export a json data of this and import it back in the future.`",
     "You may also choose to ignore CS/CU mods or mods that you have S/U'ed.",
+    "Try out the simulator below too.",
   ],
   title: "NUS GPA Calculator",
   description: "Calculate and simulate your NUS GPA",

@@ -78,7 +78,7 @@ export default function GradeSimulator() {
 
       {/* Current Units Input */}
       <NumberInput
-        label="Current Units"
+        label="Current Units (only graded units, exclude CS/CU)"
         value={currentUnits}
         onChange={(e) => setCurrentUnits(Number(e))}
         min={0}
@@ -97,7 +97,7 @@ export default function GradeSimulator() {
 
       {/* Units Left Input */}
       <NumberInput
-        label="Units Left"
+        label="Planned units to take next semester (exclude CS/CU)"
         value={unitsLeft}
         onChange={(e) => setUnitsLeft(Number(e))}
         min={0}
