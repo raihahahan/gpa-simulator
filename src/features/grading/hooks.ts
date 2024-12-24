@@ -14,13 +14,14 @@ export function useGrading() {
   const [error, setError] = useState("");
 
   const addOrUpdateModule = (): void => {
+    setError("");
     if (newModule.name && newModule.grade && newModule.credits > 0) {
       const gradeData = GRADES.find((g) => g.grade === newModule.grade);
-
       if (editingIndex !== null) {
         const updatedModules = [...modules];
         updatedModules[editingIndex] = {
           ...newModule,
+          name: newModule.name.toUpperCase(),
           points: gradeData ? gradeData.points : 0,
         };
         setModules(updatedModules);
@@ -28,7 +29,7 @@ export function useGrading() {
       } else {
         if (
           modules.find(
-            (m) => m.name.toLowerCase() == newModule.name.toLowerCase()
+            (m) => m.name.toUpperCase() == newModule.name.toUpperCase()
           )
         ) {
           setError(`Module ${newModule.name.toUpperCase()} is already added.`);
@@ -38,6 +39,7 @@ export function useGrading() {
           ...modules,
           {
             ...newModule,
+            name: newModule.name.toUpperCase(),
             points: gradeData ? gradeData.points : 0,
           },
         ]);

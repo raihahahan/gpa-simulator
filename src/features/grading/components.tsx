@@ -155,6 +155,7 @@ export default function GradingComponent() {
               <th>Module</th>
               <th>Grade</th>
               <th>Credits</th>
+              <th>S/U?</th>
               <th>Actions</th>
             </tr>
           </thead>
@@ -163,12 +164,14 @@ export default function GradingComponent() {
               <tr style={{ textAlign: "center" }} key={index}>
                 <td>{module.name}</td>
                 <td>{module.grade}</td>
+                <td>{module.su ? "Yes" : "No"}</td>
                 <td>{module.credits}</td>
                 <td>
                   <Group style={{ justifyContent: "center" }}>
                     <Button
+                      color="orange"
                       size="xs"
-                      variant="outline"
+                      variant="filled"
                       onClick={() => handleEdit(index)}
                     >
                       Edit
