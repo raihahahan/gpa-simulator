@@ -13,7 +13,7 @@ import {
 import { calculateGPA } from "./utils";
 import Image from "next/image";
 import ComponentWrapper from "@/common/wrapper";
-import { data, gradeData, GRADES } from "../../common/data";
+import { data, GRADES } from "../../common/data";
 import {
   IconBrandGithub,
   IconDownload,
@@ -261,10 +261,10 @@ export const GradeTable = () => {
           </Table.Tr>
         </Table.Thead>
         <Table.Tbody>
-          {gradeData.map((item, index) => (
+          {GRADES.map((item, index) => (
             <Table.Tr key={index}>
-              <Table.Td>{item.letterGrade}</Table.Td>
-              <Table.Td>{item.gradePoint}</Table.Td>
+              <Table.Td>{item.grade}</Table.Td>
+              <Table.Td>{item.points.toFixed(2)}</Table.Td>
             </Table.Tr>
           ))}
         </Table.Tbody>

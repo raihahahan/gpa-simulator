@@ -5,23 +5,9 @@ export const data = {
     "Add the courses you have completed or wish to simulate.",
     "Once done, you may export a json data of this and import it back in the future.`",
   ],
-  title: "NUS GPA Simulator",
-  description: "Simulate your NUS GPA",
+  title: "NUS GPA Calculator",
+  description: "Calculate and simulate your NUS GPA",
 };
-
-export const gradeData = [
-  { letterGrade: "A+", gradePoint: 5 },
-  { letterGrade: "A", gradePoint: 5 },
-  { letterGrade: "A-", gradePoint: 4.5 },
-  { letterGrade: "B+", gradePoint: 4 },
-  { letterGrade: "B", gradePoint: 3.5 },
-  { letterGrade: "B-", gradePoint: 3 },
-  { letterGrade: "C+", gradePoint: 2.5 },
-  { letterGrade: "C", gradePoint: 2 },
-  { letterGrade: "D+", gradePoint: 1.5 },
-  { letterGrade: "D", gradePoint: 1 },
-  { letterGrade: "F", gradePoint: 0 },
-];
 
 export const GRADES: Grade[] = [
   { grade: "A+", points: 5.0 },
