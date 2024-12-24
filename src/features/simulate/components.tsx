@@ -111,7 +111,7 @@ export default function GradeSimulator() {
 
       {/* Result Display */}
       <Group mt="lg" align="center">
-        <Text size="lg">Required Grade per Module: </Text>
+        <Text size="lg">Required Grade for the Semester</Text>
         {typeof result === "number" ? (
           <Text size="xl">{result.toFixed(2)} GPA</Text>
         ) : (
