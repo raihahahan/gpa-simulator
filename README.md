@@ -1,5 +1,5 @@
 
-# NUS GPA Simulator
+# NUS GPA Calculator / Simulator
 
 A fast and efficient GPA simulator for NUS students. This tool allows you to simulate your GPA based on your completed courses and grades, providing a much faster and user-friendly experience compared to the official NUS GPA calculator ([official tool](https://inetapps.nus.edu.sg/capcalc/cap_calculator.aspx)).
 
