@@ -1,7 +1,7 @@
 import { Module } from "./types";
 
 export const calculateGPA = (modules: Module[]): string => {
-  modules = modules.filter((m) => !m.su && m.name != "CS/CU");
+  modules = modules.filter((m) => !m.su && m.grade != "CS/CU");
   const totalCredits = modules.reduce((acc, module) => acc + module.credits, 0);
   const totalPoints = modules.reduce(
     (acc, module) => acc + module.credits * module.points,
