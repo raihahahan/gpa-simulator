@@ -1,16 +1,36 @@
 "use client";
 import { useState } from "react";
-import { NumberInput, Button, Text, Group } from "@mantine/core";
+import { NumberInput, Button, Text, Group, FileInput } from "@mantine/core";
 import ComponentWrapper from "@/common/wrapper";
 import { useGlobalMediaQuery } from "@/common/hooks";
-import { GRADES } from "@/common/data";
+import { data, GRADES } from "@/common/data";
+import Image from "next/image";
+
+interface ParsedTranscriptData {
+  totalGradedUnits: number;
+  currentGPA: number;
+  courses: Array<{
+    code: string;
+    name: string;
+    grade: string;
+    units: number;
+  }>;
+}
+
+interface SimulateResults {
+  required: number;
+  maxAchievable: number;
+}
 
 export default function GradeSimulator() {
   const [currentGPA, setCurrentGPA] = useState<number>(0);
   const [currentUnits, setCurrentUnits] = useState<number>(0);
   const [desiredGPA, setDesiredGPA] = useState<number>(0);
   const [unitsLeft, setUnitsLeft] = useState<number>(0);
-  const [result, setResult] = useState<string | number>(""); // To store the result of the calculation
+  const [result, setResult] = useState<string | SimulateResults>("");
+  const [transcriptFile, setTranscriptFile] = useState<File | null>(null);
+  const [parseError, setParseError] = useState<string>("");
+  const [isUploading, setIsUploading] = useState<boolean>(false);
   const { xs } = useGlobalMediaQuery();
 
   function calculateRequiredGPA(
@@ -18,30 +38,70 @@ export default function GradeSimulator() {
     completedUnits: number,
     plannedUnits: number,
     desiredGPA: number
-  ): number | string {
+  ): { required: number; maxAchievable: number } | string {
     if (plannedUnits <= 0) {
-      return "Invalid units left"; // Ensure units left is positive
+      return "Invalid units left";
     }
 
-    console.log(currentGPA, completedUnits, plannedUnits, desiredGPA);
     const totalPointsRequired = desiredGPA * (completedUnits + plannedUnits);
     const currPoints = currentGPA * completedUnits;
     const requiredPoints = totalPointsRequired - currPoints;
     const requiredGPA = requiredPoints / plannedUnits;
+    const maxRequiredPoints = GRADES[0].points * plannedUnits;
+    const maxTotalPointsRequired = maxRequiredPoints + currPoints;
+    const achievable = maxTotalPointsRequired / (completedUnits + plannedUnits);
 
     if (requiredGPA > GRADES[0].points) {
-      const maxRequiredPoints = GRADES[0].points * plannedUnits;
-      const maxTotalPointsRequired = maxRequiredPoints + currPoints;
-      const achievable =
-        maxTotalPointsRequired / (completedUnits + plannedUnits);
-
-      return `Your desired GPA is too high as you will need a GPA of ${requiredGPA}. Your max achievable GPA is ${achievable.toFixed(
+      return `Your desired GPA is too high as you will need a GPA of ${requiredGPA.toFixed(
+        2
+      )}. Your max achievable GPA is ${achievable.toFixed(
         2
       )} with a score of A/A+ for every module.`;
     }
 
-    return requiredGPA;
+    return { required: requiredGPA, maxAchievable: achievable };
   }
+
+  const handleTranscriptUpload = async (file: File | null) => {
+    if (!file) {
+      setTranscriptFile(null);
+      setParseError("");
+      return;
+    }
+
+    setTranscriptFile(file);
+    setParseError("");
+    setIsUploading(true);
+
+    try {
+      const formData = new FormData();
+      formData.append("transcript", file);
+
+      const response = await fetch("/api/parse-transcript", {
+        method: "POST",
+        body: formData,
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || "Failed to parse transcript");
+      }
+
+      const parsed: ParsedTranscriptData = await response.json();
+
+      setCurrentGPA(parsed.currentGPA);
+      setCurrentUnits(parsed.totalGradedUnits);
+      setParseError("");
+    } catch (error) {
+      setParseError(
+        error instanceof Error ? error.message : "Failed to parse transcript"
+      );
+      setCurrentGPA(0);
+      setCurrentUnits(0);
+    } finally {
+      setIsUploading(false);
+    }
+  };
 
   const handleSubmit = () => {
     const requiredGrade = calculateRequiredGPA(
@@ -55,16 +115,73 @@ export default function GradeSimulator() {
 
   return (
     <ComponentWrapper>
-      <Text
-        size="xl"
+      <div
         style={{
-          textAlign: "center",
-          fontWeight: "bolder",
-          fontSize: xs ? 20 : 24,
+          display: "flex",
+          flexDirection: "row",
+          alignItems: "center",
+          justifyContent: "center",
         }}
       >
-        NUS GPA Simulator
-      </Text>
+        <Image
+          src="/icon.webp"
+          width={xs ? 30 : 40}
+          height={xs ? 30 : 40}
+          style={{ borderRadius: 100 }}
+          alt="icon"
+        />
+        <div style={{ width: 10 }}></div>
+        <Text
+          size="xl"
+          style={{
+            textAlign: "center",
+            fontWeight: "bolder",
+            fontSize: xs ? 20 : 24,
+          }}
+        >
+          NUS GPA Simulator
+        </Text>
+      </div>
+
+      <div>
+        <Text
+          fw="lighter"
+          size="sm"
+          style={{
+            textAlign: "center",
+            fontWeight: "bolder",
+            fontSize: 16,
+          }}
+        >
+          {data.simulatorInstructions}
+        </Text>
+        <br />
+      </div>
+
+      {/* Transcript Upload */}
+      <FileInput
+        label="Upload Transcript (Optional)"
+        description="Upload your NUS transcript PDF to auto-fill GPA and units"
+        placeholder="Choose transcript file"
+        accept="application/pdf"
+        value={transcriptFile}
+        onChange={handleTranscriptUpload}
+        mb="md"
+        clearable
+        disabled={isUploading}
+      />
+
+      {isUploading && (
+        <Text size="sm" color="blue" mb="md">
+          Parsing transcript...
+        </Text>
+      )}
+
+      {parseError && (
+        <Text size="sm" color="red" mb="md">
+          {parseError}
+        </Text>
+      )}
 
       {/* Current GPA Input */}
       <NumberInput
@@ -73,6 +190,8 @@ export default function GradeSimulator() {
         onChange={(e) => setCurrentGPA(Number(e))}
         min={0}
         max={5}
+        step={0.01}
+        decimalScale={2}
         mb="md"
       />
 
@@ -92,12 +211,14 @@ export default function GradeSimulator() {
         onChange={(e) => setDesiredGPA(Number(e))}
         min={0}
         max={5}
+        step={0.01}
+        decimalScale={2}
         mb="md"
       />
 
       {/* Units Left Input */}
       <NumberInput
-        label="Planned units to take next semester (exclude CS/CU)"
+        label="Planned units to take next semester / Current units this semester (exclude CS/CU)"
         value={unitsLeft}
         onChange={(e) => setUnitsLeft(Number(e))}
         min={0}
@@ -110,16 +231,23 @@ export default function GradeSimulator() {
       </Button>
 
       {/* Result Display */}
-      <Group mt="lg" align="center">
-        <Text size="lg">Required Grade for the Semester</Text>
-        {typeof result === "number" ? (
-          <Text size="xl">{result.toFixed(2)} GPA</Text>
-        ) : (
-          <Text size="lg" color="red">
-            {result}
-          </Text>
-        )}
-      </Group>
+      {result && (
+        <Group mt="lg" align="center">
+          <Text size="lg">Required Grade for the Semester:</Text>
+          {typeof result != "string" ? (
+            <>
+              <Text size="xl">{result.required.toFixed(2)} GPA</Text>||
+              <Text size="xl">
+                Max achievable GPA: {result.maxAchievable.toFixed(2)}
+              </Text>
+            </>
+          ) : (
+            <Text size="lg" color="red">
+              {result}
+            </Text>
+          )}
+        </Group>
+      )}
     </ComponentWrapper>
   );
 }

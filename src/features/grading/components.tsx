@@ -11,7 +11,6 @@ import {
   ActionIcon,
 } from "@mantine/core";
 import { calculateGPA, calculateGradedUnits, calculateSuCount } from "./utils";
-import Image from "next/image";
 import ComponentWrapper from "@/common/wrapper";
 import { data, GRADES } from "../../common/data";
 import {
@@ -59,14 +58,6 @@ export default function GradingComponent() {
           justifyContent: "center",
         }}
       >
-        <Image
-          src="/icon.webp"
-          width={xs ? 30 : 40}
-          height={xs ? 30 : 40}
-          style={{ borderRadius: 100 }}
-          alt="icon"
-        />
-        <div style={{ width: 10 }}></div>
         <Text
           style={{
             textAlign: "center",

@@ -4,8 +4,8 @@ import GradeSimulator from "@/features/simulate/components";
 export default function Home() {
   return (
     <div>
-      <GradingComponent />
       <GradeSimulator />
+      <GradingComponent />
       <GradeTable />
     </div>
   );
