@@ -45,6 +45,18 @@ interface PDFData {
   }>;
 }
 
+function splitByColumn(items: { x: number; text: string }[]) {
+  const left: string[] = [];
+  const right: string[] = [];
+
+  for (const item of items) {
+    if (item.x < 25) left.push(item.text);
+    else right.push(item.text);
+  }
+
+  return [left.join(" ").trim(), right.join(" ").trim()].filter(Boolean);
+}
+
 function parseTranscriptFromJSON(pdfData: PDFData): ParsedTranscriptData {
   let totalGradedUnits = 0;
   let totalGradePoints = 0;
@@ -56,7 +68,7 @@ function parseTranscriptFromJSON(pdfData: PDFData): ParsedTranscriptData {
     for (const textItem of page.Texts) {
       // Decode the text (pdf2json uses URI encoding)
       const decodedText = textItem.R.map((r) => decodeURIComponent(r.T)).join(
-        ""
+        "",
       );
       if (decodedText.trim()) {
         // Only add non-empty texts
@@ -77,67 +89,64 @@ function parseTranscriptFromJSON(pdfData: PDFData): ParsedTranscriptData {
     return a.y - b.y; // Different lines, sort by y (top to bottom)
   });
 
-  // Combine texts on the same line (same Y position within tolerance)
-  const lines: Array<{ y: number; text: string }> = [];
-  let currentLine: { y: number; texts: string[] } | null = null;
+  // for (const item of allTexts) {
+  //   console.log(item);
+  // }
+
+  // group rows and columns
+  const rows: Array<Array<{ x: number; text: string }>> = [];
+
+  let currentRow: {
+    y: number;
+    items: Array<{ x: number; text: string }>;
+  } | null = null;
 
   for (const item of allTexts) {
-    if (!currentLine || Math.abs(item.y - currentLine.y) > 0.1) {
-      // Start a new line
-      if (currentLine) {
-        lines.push({
-          y: currentLine.y,
-          text: currentLine.texts.join(" "),
-        });
+    if (!currentRow || Math.abs(item.y - currentRow.y) > 0.1) {
+      if (currentRow) {
+        rows.push(currentRow.items);
       }
-      currentLine = { y: item.y, texts: [item.text] };
+      currentRow = {
+        y: item.y,
+        items: [{ x: item.x, text: item.text }],
+      };
     } else {
-      // Add to current line
-      currentLine.texts.push(item.text);
+      currentRow.items.push({ x: item.x, text: item.text });
     }
   }
 
-  // Don't forget the last line
-  if (currentLine) {
-    lines.push({
-      y: currentLine.y,
-      text: currentLine.texts.join(" "),
-    });
+  if (currentRow) {
+    rows.push(currentRow.items);
   }
-
-  // console.log("Combined lines:", lines);
 
   // Course code regex patterns
   const gradeRegex = /^(A\+|A-|A|B\+|B-|B|C\+|C|D\+|D|F|S|CS|CU|-)$/;
   const unitsRegex = /^(\d+\.\d{2})$/;
 
-  // Process each line to find courses
-  for (const line of lines) {
-    const parts = line.text.split(" ");
+  for (const row of rows) {
+    const columns = splitByColumn(row);
 
-    if (parts.length < 4) continue; // Need at least: CODE NAME GRADE UNITS
+    for (const colText of columns) {
+      const parts = colText.split(" ");
 
-    // Check last 2 words for GRADE UNITS pattern
-    const lastWord = parts[parts.length - 1];
-    const secondLastWord = parts[parts.length - 2];
+      if (parts.length < 4) continue;
 
-    // Check if last word is units and second last is a grade
-    if (!unitsRegex.test(lastWord)) continue;
-    if (!gradeRegex.test(secondLastWord)) continue;
+      const lastWord = parts[parts.length - 1];
+      const secondLastWord = parts[parts.length - 2];
 
-    const units = parseFloat(lastWord);
-    const grade = secondLastWord;
-    console.log(lastWord, secondLastWord);
-    console.log(units, grade);
+      if (!unitsRegex.test(lastWord)) continue;
+      if (!gradeRegex.test(secondLastWord)) continue;
 
-    // Skip if grade is CS (S/U) - we only want graded courses
-    if (grade === "CS" || grade === "CU" || grade === "S" || grade === "-")
-      continue;
+      const units = parseFloat(lastWord);
+      const grade = secondLastWord;
 
-    // Calculate GPA for graded courses only
-    if (grade in GRADE_TO_GPA) {
-      totalGradedUnits += units;
-      totalGradePoints += GRADE_TO_GPA[grade] * units;
+      if (grade === "CS" || grade === "CU" || grade === "S" || grade === "-")
+        continue;
+
+      if (grade in GRADE_TO_GPA) {
+        totalGradedUnits += units;
+        totalGradePoints += GRADE_TO_GPA[grade] * units;
+      }
     }
   }
 
@@ -193,7 +202,7 @@ export async function POST(request: NextRequest) {
         error: "Failed to parse transcript",
         details: error instanceof Error ? error.message : "Unknown error",
       },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }
