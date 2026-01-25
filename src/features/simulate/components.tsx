@@ -37,7 +37,7 @@ export default function GradeSimulator() {
     currentGPA: number,
     completedUnits: number,
     plannedUnits: number,
-    desiredGPA: number
+    desiredGPA: number,
   ): { required: number; maxAchievable: number } | string {
     if (plannedUnits <= 0) {
       return "Invalid units left";
@@ -51,12 +51,21 @@ export default function GradeSimulator() {
     const maxTotalPointsRequired = maxRequiredPoints + currPoints;
     const achievable = maxTotalPointsRequired / (completedUnits + plannedUnits);
 
+    const A = GRADES[0].points; // 5.0
+    const unitsPerModule = 4;
+
+    const numerator = desiredGPA * completedUnits - currPoints;
+    const denominator = unitsPerModule * (A - desiredGPA);
+
+    // denominator > 0 because desiredGPA < 5.0
+    const extraModules = Math.ceil(numerator / denominator);
+
     if (requiredGPA > GRADES[0].points) {
       return `Your desired GPA is too high as you will need a GPA of ${requiredGPA.toFixed(
-        2
+        2,
       )}. Your max achievable GPA is ${achievable.toFixed(
-        2
-      )} with a score of A/A+ for every module.`;
+        2,
+      )} with a score of A/A+ for every module. OR you could take a total of ${extraModules} 4MC (total ${extraModules * 4} MCs) graded modules scoring A/A+ in each.`;
     }
 
     return { required: requiredGPA, maxAchievable: achievable };
@@ -94,7 +103,7 @@ export default function GradeSimulator() {
       setParseError("");
     } catch (error) {
       setParseError(
-        error instanceof Error ? error.message : "Failed to parse transcript"
+        error instanceof Error ? error.message : "Failed to parse transcript",
       );
       setCurrentGPA(0);
       setCurrentUnits(0);
@@ -108,7 +117,7 @@ export default function GradeSimulator() {
       currentGPA,
       currentUnits,
       unitsLeft,
-      desiredGPA
+      desiredGPA,
     );
     setResult(requiredGrade);
   };
