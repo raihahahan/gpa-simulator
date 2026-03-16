@@ -6,6 +6,7 @@ import {
   mantineHtmlProps,
 } from "@mantine/core";
 import { data } from "@/common/data";
+import { Analytics } from "@vercel/analytics/next";
 
 export const metadata = {
   title: data.title,
