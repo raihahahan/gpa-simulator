@@ -24,7 +24,10 @@ export default function RootLayout({
         <ColorSchemeScript />
       </head>
       <body>
-        <MantineProvider>{children}</MantineProvider>
+        <>
+          <MantineProvider>{children}</MantineProvider>
+          <Analytics />
+        </>
       </body>
     </html>
   );
